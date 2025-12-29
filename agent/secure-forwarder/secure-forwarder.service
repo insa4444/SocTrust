@@ -1,0 +1,44 @@
+[Unit]
+Description=Secure Log Forwarder (HTTP Proxy for OTLP)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+# (필요시 전용 계정으로 변경 가능하나, 19000 포트 바인딩 및 편의상 root 유지)
+
+# 작업 디렉토리 확인
+WorkingDirectory=/home/last/lastagent/forwarder
+
+# 환경 변수 로드
+EnvironmentFile=/home/last/lastagent/etc/.env
+
+# 실행 명령 (venv 사용)
+ExecStart=/home/last/lastagent/venv/bin/python /home/last/lastagent/forwarder/secure-forwarder.py
+
+Restart=always
+RestartSec=3
+
+########## Hardening ##########
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+# ProtectHome=true # .env 파일 접근을 위해 주석 처리
+
+ProtectControlGroups=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+PrivateDevices=true
+
+# 코드 및 로그 경로 읽기 전용 설정 (선택 사항)
+# ReadOnlyPaths=/home/last/lastagent/forwarder
+
+[Install]
+WantedBy=multi-user.target

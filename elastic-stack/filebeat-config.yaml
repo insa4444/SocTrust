@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: elastic-system
+data:
+  filebeat.yml: |
+    filebeat.inputs:
+      - type: filestream
+        id: container-logs
+        paths:
+          - /var/log/containers/*.log
+        parsers:
+          - container: ~
+
+    output.logstash:
+      hosts: ["logstash.elastic-system.svc:5044"]
+
+    setup.ilm.enabled: false
